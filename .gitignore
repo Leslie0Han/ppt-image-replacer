@@ -75,3 +75,6 @@ test_images/
 new_images/
 *.pptx
 !test_ppt.py
+.claude/
+__pycache__/
+*.pyc
