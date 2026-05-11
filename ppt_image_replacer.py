@@ -430,29 +430,51 @@ class PPTImageReplacer:
         self.checked_count_var.set(f"已勾选: {len(self.checked_images)} 张")
 
     def match_folder_images(self):
-        """匹配文件夹中的图片"""
+        """按文件名匹配文件夹中的图片到对应坑位"""
         if not self.folder_path:
             return
 
+        import re
         image_extensions = {'.png', '.jpg', '.jpeg', '.gif', '.bmp', '.tiff'}
-        folder_images = []
-        for file in sorted(os.listdir(self.folder_path)):
-            ext = os.path.splitext(file)[1].lower()
-            if ext in image_extensions:
-                folder_images.append(os.path.join(self.folder_path, file))
 
-        if not folder_images:
+        # 解析文件名 → {(slide_idx, img_idx): filepath}
+        folder_map = {}
+        for file in os.listdir(self.folder_path):
+            ext = os.path.splitext(file)[1].lower()
+            if ext not in image_extensions:
+                continue
+            # 匹配 "第X页第X张图" 格式
+            m = re.search(r'第(\d+)页第(\d+)张图', file)
+            if m:
+                s_idx = int(m.group(1))
+                i_idx = int(m.group(2))
+                folder_map[(s_idx, i_idx)] = os.path.join(self.folder_path, file)
+
+        if not folder_map:
+            messagebox.showwarning("警告",
+                "文件夹中没有找到匹配的图片！\n\n"
+                "文件名需符合「第X页第X张图」格式，\n"
+                "例如：第1页第1张图.png")
             return
 
-        image_idx = 0
-        for slide_card in self.slide_cards:
-            for img_card in slide_card.get_image_cards():
-                if image_idx < len(folder_images):
-                    img_card.set_new_image(folder_images[image_idx])
-                    self.new_images[img_card.image_info['id']] = folder_images[image_idx]
-                    image_idx += 1
+        # 按文件名匹配到对应图片卡片
+        matched = 0
+        for slide_data in self.slides_data:
+            slide_idx = slide_data['slide_idx']
+            for img_idx, img_info in enumerate(slide_data['images'], 1):
+                key = (slide_idx, img_idx)
+                if key in folder_map:
+                    # 找到对应的图片卡片
+                    for slide_card in self.slide_cards:
+                        for img_card in slide_card.get_image_cards():
+                            if img_card.image_info['id'] == img_info['id']:
+                                img_card.set_new_image(folder_map[key])
+                                self.new_images[img_info['id']] = folder_map[key]
+                                matched += 1
+                                break
 
         self.update_status()
+        self.status_var.set(f"按文件名匹配完成: 匹配到 {matched}/{len(folder_map)} 张图片")
 
     def replace_checked(self):
         """替换所有勾选的图片"""
