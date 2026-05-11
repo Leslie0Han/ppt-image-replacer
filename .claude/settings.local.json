@@ -13,7 +13,21 @@
       "Bash(git --version)",
       "Bash(gh --version)",
       "Bash(git init *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git config *)",
+      "Bash(git commit *)",
+      "Bash(where gh *)",
+      "Bash(winget install *)",
+      "Bash(export PATH=\"/c/Program Files/GitHub CLI:$PATH\")",
+      "Bash(gh auth *)",
+      "Bash(gh repo *)",
+      "Bash(gh release create v1.0.0 --title 'PPT Image Replacer v1.0.0' --notes ' *)",
+      "Bash(pip show *)",
+      "Bash(pyinstaller --clean ppt_image_replacer.spec)",
+      "Bash(powershell -Command \"Compress-Archive -Path 'release/*' -DestinationPath 'PPT图片替换工具_v1.0.0.zip' -Force\")",
+      "Bash(gh release *)",
+      "Bash(powershell -Command \"Compress-Archive -Path 'release/*' -DestinationPath 'PPT图片替换工具_v1.1.0.zip' -Force\")"
     ]
   }
 }

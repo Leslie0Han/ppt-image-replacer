@@ -239,6 +239,8 @@ class PPTImageReplacer:
         right_frame = ttk.Frame(toolbar)
         right_frame.pack(side=tk.RIGHT)
 
+        ttk.Button(right_frame, text="导出原图",
+                  command=self.export_images).pack(side=tk.LEFT, padx=5)
         ttk.Button(right_frame, text="替换勾选的图片",
                   command=self.replace_checked).pack(side=tk.LEFT, padx=5)
         ttk.Button(right_frame, text="一键替换全部",
@@ -496,6 +498,66 @@ class PPTImageReplacer:
             return
 
         self.save_ppt()
+
+    def export_images(self):
+        """导出PPT中的所有图片"""
+        if not self.slides_data:
+            messagebox.showwarning("警告", "请先扫描PPT文件！")
+            return
+
+        # 选择导出目录
+        export_dir = filedialog.askdirectory(title="选择导出目录")
+        if not export_dir:
+            return
+
+        self.status_var.set("正在导出图片...")
+        self.root.update()
+
+        try:
+            exported_count = 0
+
+            for slide_data in self.slides_data:
+                slide_idx = slide_data['slide_idx']
+
+                for img_idx, img_info in enumerate(slide_data['images'], 1):
+                    # 获取图片格式
+                    image_blob = img_info['blob']
+                    image_stream = io.BytesIO(image_blob)
+                    pil_image = Image.open(image_stream)
+
+                    # 确定文件扩展名
+                    format_name = pil_image.format
+                    if format_name == 'JPEG':
+                        ext = '.jpg'
+                    elif format_name == 'PNG':
+                        ext = '.png'
+                    elif format_name == 'GIF':
+                        ext = '.gif'
+                    elif format_name == 'BMP':
+                        ext = '.bmp'
+                    else:
+                        ext = '.png'  # 默认使用png
+
+                    # 生成文件名：第几页第几张图
+                    filename = f"第{slide_idx}页第{img_idx}张图{ext}"
+                    filepath = os.path.join(export_dir, filename)
+
+                    # 保存图片
+                    pil_image.save(filepath)
+                    exported_count += 1
+
+            self.status_var.set(f"导出完成: 共导出 {exported_count} 张图片")
+            messagebox.showinfo("成功",
+                              f"图片导出完成！\n\n"
+                              f"已导出: {exported_count} 张图片\n"
+                              f"保存位置: {export_dir}")
+
+            # 打开导出目录
+            os.startfile(export_dir)
+
+        except Exception as e:
+            messagebox.showerror("错误", f"导出图片时出错: {str(e)}")
+            self.status_var.set("导出失败")
 
     def save_ppt(self):
         """保存PPT"""
