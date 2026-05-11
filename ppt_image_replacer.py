@@ -239,6 +239,10 @@ class PPTImageReplacer:
         right_frame = ttk.Frame(toolbar)
         right_frame.pack(side=tk.RIGHT)
 
+        ttk.Button(right_frame, text="全选所有图片",
+                  command=self.select_all_images).pack(side=tk.LEFT, padx=5)
+        ttk.Button(right_frame, text="反选",
+                  command=self.invert_selection).pack(side=tk.LEFT, padx=5)
         ttk.Button(right_frame, text="导出原图",
                   command=self.export_images).pack(side=tk.LEFT, padx=5)
         ttk.Button(right_frame, text="替换勾选的图片",
@@ -252,7 +256,7 @@ class PPTImageReplacer:
         help_frame = ttk.Frame(main_frame)
         help_frame.pack(fill=tk.X, padx=10, pady=(0, 5))
 
-        help_text = "操作说明：① 勾选需要替换的图片（可跨页多选）→ ② 点击「替换勾选的图片」选择一张新图片 → ③ 所有勾选的图片都会被替换为同一张"
+        help_text = "操作说明：勾选图片后可「替换」或「导出」| 「全选」选中所有图片 | 「反选」切换选中状态"
         ttk.Label(help_frame, text=help_text, font=("微软雅黑", 9),
                  foreground="blue").pack(side=tk.LEFT)
 
@@ -499,10 +503,37 @@ class PPTImageReplacer:
 
         self.save_ppt()
 
+    def select_all_images(self):
+        """全选所有图片"""
+        for slide_card in self.slide_cards:
+            for img_card in slide_card.get_image_cards():
+                img_card.set_checked(True)
+                self.checked_images.add(img_card.image_info['id'])
+        self.checked_count_var.set(f"已勾选: {len(self.checked_images)} 张")
+
+    def invert_selection(self):
+        """反选所有图片"""
+        for slide_card in self.slide_cards:
+            for img_card in slide_card.get_image_cards():
+                img_id = img_card.image_info['id']
+                if img_id in self.checked_images:
+                    img_card.set_checked(False)
+                    self.checked_images.discard(img_id)
+                else:
+                    img_card.set_checked(True)
+                    self.checked_images.add(img_id)
+        self.checked_count_var.set(f"已勾选: {len(self.checked_images)} 张")
+
     def export_images(self):
-        """导出PPT中的所有图片"""
+        """导出勾选的图片（未勾选则提示）"""
         if not self.slides_data:
             messagebox.showwarning("警告", "请先扫描PPT文件！")
+            return
+
+        if not self.checked_images:
+            messagebox.showwarning("警告", "请先勾选需要导出的图片！\n\n"
+                                  "点击图片卡片上的勾选框选择图片，\n"
+                                  "或使用「全选所有图片」按钮。")
             return
 
         # 选择导出目录
@@ -520,6 +551,9 @@ class PPTImageReplacer:
                 slide_idx = slide_data['slide_idx']
 
                 for img_idx, img_info in enumerate(slide_data['images'], 1):
+                    if img_info['id'] not in self.checked_images:
+                        continue
+
                     # 获取图片格式
                     image_blob = img_info['blob']
                     image_stream = io.BytesIO(image_blob)
