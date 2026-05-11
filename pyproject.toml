@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "ppt-image-replacer"
+version = "1.0.0"
+description = "A visual tool for batch replacing images in PowerPoint files"
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.7"
+authors = [
+    {name = "Leslie", email = "leslie@example.com"},
+]
+keywords = ["ppt", "powerpoint", "image", "replace", "batch"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Office/Business",
+    "Topic :: Multimedia :: Graphics",
+]
+dependencies = [
+    "python-pptx>=0.6.21",
+    "Pillow>=9.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/lesliehanx/ppt-image-replacer"
+Repository = "https://github.com/lesliehanx/ppt-image-replacer"
+Issues = "https://github.com/lesliehanx/ppt-image-replacer/issues"
+
+[project.scripts]
+ppt-replacer = "ppt_image_replacer:main"
+
+[tool.setuptools]
+py-modules = ["ppt_image_replacer"]

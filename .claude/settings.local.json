@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip install *)",
+      "Bash(python test_ppt.py)",
+      "Bash(python *)",
+      "Bash(py *)",
+      "Bash(C:/Users/hanxuan/AppData/Local/Programs/Python/Python311/python.exe *)",
+      "WebSearch",
+      "Bash(cmd //c \"测试环境.bat\")",
+      "Bash(cmd //c test_env.bat)",
+      "Bash(where python *)",
+      "Bash(git --version)",
+      "Bash(gh --version)",
+      "Bash(git init *)",
+      "Bash(git add *)"
+    ]
+  }
+}
